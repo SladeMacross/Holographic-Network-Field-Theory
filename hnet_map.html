@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HNet Theory: Concept Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111827;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .legend-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .legend-box.green { background: #22c55e; }
+        .legend-box.amber { background: #f59e0b; }
+        .legend-box.red { background: #ef4444; }
+        .legend-box.blue { 
+            background: #1e3a5f; 
+            border: 2px solid #3b82f6;
+        }
+        
+        .diagram {
+            position: relative;
+            background: #1f2937;
+            border-radius: 12px;
+            height: 600px;
+            margin-bottom: 20px;
+        }
+        
+        .region-label {
+            position: absolute;
+            color: #6b7280;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .node {
+            position: absolute;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            max-width: 120px;
+            text-align: center;
+            line-height: 1.3;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .node:hover {
+            transform: scale(1.05);
+        }
+        
+        .node.selected {
+            box-shadow: 0 0 0 3px white, 0 0 0 5px currentColor;
+        }
+        
+        .node.hnet-green {
+            background: #22c55e;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .node.hnet-amber {
+            background: #f59e0b;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .node.hnet-red {
+            background: #ef4444;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .node.existing {
+            background: #1e3a5f;
+            border: 2px solid #3b82f6;
+            color: #93c5fd;
+        }
+        
+        .connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .detail-panel {
+            background: #1f2937;
+            border-radius: 12px;
+            padding: 20px;
+            display: none;
+        }
+        
+        .detail-panel.visible {
+            display: block;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .detail-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .detail-title.green { color: #22c55e; }
+        .detail-title.amber { color: #f59e0b; }
+        .detail-title.red { color: #ef4444; }
+        .detail-title.blue { color: #3b82f6; }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .close-btn:hover {
+            color: white;
+        }
+        
+        .detail-description {
+            color: #d1d5db;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+        
+        .gap-box {
+            background: #374151;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+        }
+        
+        .gap-label {
+            font-size: 11px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .gap-text {
+            color: #e5e7eb;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .key-people {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #9ca3af;
+        }
+        
+        .connections-section {
+            margin-top: 16px;
+        }
+        
+        .connections-label {
+            font-size: 11px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .connection-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .connection-tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid;
+        }
+        
+        .connection-tag.green {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+        
+        .connection-tag.amber {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .connection-tag.red {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        
+        .connection-tag.blue {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .stat-box {
+            background: #1f2937;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .stat-number.green { color: #22c55e; }
+        .stat-number.amber { color: #f59e0b; }
+        .stat-number.red { color: #ef4444; }
+        .stat-number.blue { color: #3b82f6; }
+        
+        .stat-label {
+            color: #9ca3af;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .legend {
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HNet Theory: Concept Map</h1>
+        <p class="subtitle">Click nodes to see details. Lines show connections between concepts.</p>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box green"></div>
+                <span>Strong match exists</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box amber"></div>
+                <span>Partial match</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box red"></div>
+                <span>Gap (no existing math)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box blue"></div>
+                <span>Existing formalism</span>
+            </div>
+        </div>
+        
+        <div class="diagram" id="diagram">
+            <div class="region-label" style="top: 8px; left: 50%; transform: translateX(-50%);">HNet Core</div>
+            <div class="region-label" style="top: 8px; left: 16px;">Existing Math</div>
+            <div class="region-label" style="top: 8px; right: 16px;">Existing Math</div>
+            <div class="region-label" style="bottom: 8px; left: 50%; transform: translateX(-50%);">Bridges to Physics</div>
+            
+            <svg class="connections" id="connections"></svg>
+            
+            <!-- Nodes will be added by JavaScript -->
+        </div>
+        
+        <div class="detail-panel" id="detail-panel">
+            <div class="detail-header">
+                <div>
+                    <h2 class="detail-title" id="detail-title"></h2>
+                    <p class="detail-description" id="detail-description"></p>
+                </div>
+                <button class="close-btn" onclick="closeDetail()">×</button>
+            </div>
+            <div class="gap-box" id="gap-box">
+                <div class="gap-label">Gap / What's Missing</div>
+                <p class="gap-text" id="gap-text"></p>
+            </div>
+            <div class="key-people" id="key-people"></div>
+            <div class="connections-section">
+                <div class="connections-label">Connected to:</div>
+                <div class="connection-tags" id="connection-tags"></div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-number green">2</div>
+                <div class="stat-label">Strong matches</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number amber">3</div>
+                <div class="stat-label">Partial matches</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number red">2</div>
+                <div class="stat-label">Gaps (need new math)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number blue">10</div>
+                <div class="stat-label">Existing formalisms</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const data = {
+            'network-field': {
+                title: 'Network-Field Hybrid',
+                type: 'hnet',
+                status: 'amber',
+                description: 'Your foundational substrate—neither pure network nor pure field, but a hybrid with properties of both plus emergent ones.',
+                gap: "The hybrid dynamics equations don't exist yet. LQG is pure network, QFT is pure field. Your synthesis is conceptual only.",
+                connections: ['spin-networks', 'qft'],
+                x: 300, y: 160
+            },
+            'holographic': {
+                title: '3D Boundary-less Holography',
+                type: 'hnet',
+                status: 'red',
+                description: 'Every local region encodes the correlation state of the whole—but self-contained, no external boundary.',
+                gap: "AdS/CFT requires a boundary. Your boundary-less version addresses a known problem but has no formalism yet.",
+                connections: ['ads-cft', 'entanglement'],
+                x: 420, y: 70
+            },
+            'thermodynamic': {
+                title: 'Thermodynamic Processing',
+                type: 'hnet',
+                status: 'amber',
+                description: 'The mechanism that actualizes geometric potentials—events that constrain and update correlations.',
+                gap: "Entropic gravity exists but doesn't include your Higgs→time connection.",
+                connections: ['entropic-gravity', 'decoherence'],
+                x: 540, y: 160
+            },
+            'higgs-time': {
+                title: 'Higgs → Time Flow',
+                type: 'hnet',
+                status: 'red',
+                description: 'Higgs interaction gives continuous time experience; no Higgs = event-time only (massless particles).',
+                gap: "This is entirely yours. No existing formalism unifies Higgs with time experience.",
+                connections: ['higgs-mechanism'],
+                x: 580, y: 320
+            },
+            'correlated-space': {
+                title: 'Correlated Space',
+                type: 'hnet',
+                status: 'green',
+                description: 'Space carries correlations intrinsically—objects connected through space itself.',
+                gap: "Relational QM captures this well. Your version adds the holographic encoding layer.",
+                connections: ['relational-qm', 'entanglement'],
+                x: 420, y: 250
+            },
+            'knot-particles': {
+                title: 'Knot Topology → Particles',
+                type: 'hnet',
+                status: 'amber',
+                description: 'Particles as stable topological configurations (knots/twists) in the network-field.',
+                gap: "First generation fermions work. Full Standard Model mapping incomplete.",
+                connections: ['bilson-thompson', 'knot-physics'],
+                x: 300, y: 420
+            },
+            'decoherence-bridge': {
+                title: 'Decoherence → Classical/GR',
+                type: 'hnet',
+                status: 'green',
+                description: 'Environmental decoherence as the bridge to classical spacetime and cosmology.',
+                gap: "Formalism exists. Connection to your specific framework needs work.",
+                connections: ['decoherence', 'zurek'],
+                x: 540, y: 420
+            },
+            'spin-networks': {
+                title: 'Spin Networks (LQG)',
+                type: 'existing',
+                description: 'Graphs with edges labeled by spins, nodes by intertwiners. Quantum states of geometry.',
+                keyPeople: 'Penrose, Rovelli, Smolin',
+                connections: ['network-field'],
+                x: 80, y: 120
+            },
+            'ads-cft': {
+                title: 'AdS/CFT',
+                type: 'existing',
+                description: 'Holographic duality between gravity in AdS space and CFT on its boundary.',
+                keyPeople: 'Maldacena, Witten',
+                connections: ['holographic'],
+                x: 600, y: 30
+            },
+            'entropic-gravity': {
+                title: 'Entropic Gravity',
+                type: 'existing',
+                description: 'Gravity as emergent from thermodynamic/entropic principles.',
+                keyPeople: 'Jacobson, Verlinde',
+                connections: ['thermodynamic'],
+                x: 740, y: 120
+            },
+            'relational-qm': {
+                title: 'Relational QM',
+                type: 'existing',
+                description: 'Properties exist only relative to other systems. No observer-independent states.',
+                keyPeople: 'Rovelli',
+                connections: ['correlated-space'],
+                x: 220, y: 320
+            },
+            'entanglement': {
+                title: 'Quantum Entanglement',
+                type: 'existing',
+                description: 'Non-local correlations between quantum systems.',
+                keyPeople: 'Bell, Aspect',
+                connections: ['correlated-space', 'holographic'],
+                x: 600, y: 250
+            },
+            'higgs-mechanism': {
+                title: 'Higgs Mechanism',
+                type: 'existing',
+                description: 'Explains how particles acquire mass through Higgs field interaction.',
+                keyPeople: 'Higgs, Englert',
+                connections: ['higgs-time'],
+                x: 760, y: 320
+            },
+            'bilson-thompson': {
+                title: 'Braid/Preon Models',
+                type: 'existing',
+                description: 'Particles as braided ribbons. Twists = charge, braids = chirality.',
+                keyPeople: 'Bilson-Thompson, Smolin, Kauffman',
+                connections: ['knot-particles'],
+                x: 80, y: 420
+            },
+            'knot-physics': {
+                title: 'Knot Physics',
+                type: 'existing',
+                description: 'Spacetime as branched manifold, particles as knots.',
+                keyPeople: 'Various researchers',
+                connections: ['knot-particles'],
+                x: 80, y: 510
+            },
+            'decoherence': {
+                title: 'Decoherence Program',
+                type: 'existing',
+                description: 'Environment monitors quantum systems, causing classical behavior to emerge.',
+                keyPeople: 'Zurek, Zeh, Joos',
+                connections: ['decoherence-bridge', 'thermodynamic'],
+                x: 740, y: 420
+            },
+            'zurek': {
+                title: 'Einselection',
+                type: 'existing',
+                description: 'Environment selects preferred basis states.',
+                keyPeople: 'Zurek',
+                connections: ['decoherence-bridge'],
+                x: 740, y: 510
+            },
+            'qft': {
+                title: 'Quantum Field Theory',
+                type: 'existing',
+                description: 'Fields on continuous spacetime. Standard framework for particle physics.',
+                keyPeople: 'Standard physics',
+                connections: ['network-field'],
+                x: 80, y: 210
+            }
+        };
+        
+        let selectedNode = null;
+        
+        function getNodeClass(node) {
+            if (node.type === 'existing') return 'existing';
+            return 'hnet-' + node.status;
+        }
+        
+        function getColorClass(nodeId) {
+            const node = data[nodeId];
+            if (node.type === 'existing') return 'blue';
+            return node.status;
+        }
+        
+        function init() {
+            const diagram = document.getElementById('diagram');
+            const svg = document.getElementById('connections');
+            
+            // Create nodes
+            Object.entries(data).forEach(([id, node]) => {
+                const el = document.createElement('div');
+                el.className = 'node ' + getNodeClass(node);
+                el.id = 'node-' + id;
+                el.textContent = node.title;
+                el.style.left = node.x + 'px';
+                el.style.top = node.y + 'px';
+                el.onclick = () => selectNode(id);
+                diagram.appendChild(el);
+            });
+            
+            // Draw connections
+            drawConnections();
+        }
+        
+        function drawConnections() {
+            const svg = document.getElementById('connections');
+            svg.innerHTML = '';
+            
+            const drawn = new Set();
+            
+            Object.entries(data).forEach(([id, node]) => {
+                if (node.connections) {
+                    node.connections.forEach(targetId => {
+                        const key = [id, targetId].sort().join('-');
+                        if (drawn.has(key)) return;
+                        drawn.add(key);
+                        
+                        const target = data[targetId];
+                        if (!target) return;
+                        
+                        const x1 = node.x + 50;
+                        const y1 = node.y + 18;
+                        const x2 = target.x + 50;
+                        const y2 = target.y + 18;
+                        
+                        const isHighlighted = selectedNode === id || selectedNode === targetId;
+                        const isDashed = node.type === 'existing' || target.type === 'existing';
+                        
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', x1);
+                        line.setAttribute('y1', y1);
+                        line.setAttribute('x2', x2);
+                        line.setAttribute('y2', y2);
+                        line.setAttribute('stroke', isHighlighted ? '#fff' : '#4b5563');
+                        line.setAttribute('stroke-width', isHighlighted ? 2 : 1);
+                        line.setAttribute('opacity', isHighlighted ? 1 : 0.5);
+                        if (isDashed) {
+                            line.setAttribute('stroke-dasharray', '4,4');
+                        }
+                        svg.appendChild(line);
+                    });
+                }
+            });
+        }
+        
+        function selectNode(id) {
+            // Remove previous selection
+            document.querySelectorAll('.node.selected').forEach(el => el.classList.remove('selected'));
+            
+            if (selectedNode === id) {
+                selectedNode = null;
+                document.getElementById('detail-panel').classList.remove('visible');
+                drawConnections();
+                return;
+            }
+            
+            selectedNode = id;
+            const node = data[id];
+            
+            // Highlight node
+            document.getElementById('node-' + id).classList.add('selected');
+            
+            // Update detail panel
+            const titleEl = document.getElementById('detail-title');
+            titleEl.textContent = node.title;
+            titleEl.className = 'detail-title ' + getColorClass(id);
+            
+            document.getElementById('detail-description').textContent = node.description;
+            
+            const gapBox = document.getElementById('gap-box');
+            if (node.gap && node.type !== 'existing') {
+                document.getElementById('gap-text').textContent = node.gap;
+                gapBox.style.display = 'block';
+            } else {
+                gapBox.style.display = 'none';
+            }
+            
+            const keyPeopleEl = document.getElementById('key-people');
+            if (node.keyPeople) {
+                keyPeopleEl.innerHTML = '<strong>Key people:</strong> ' + node.keyPeople;
+                keyPeopleEl.style.display = 'block';
+            } else {
+                keyPeopleEl.style.display = 'none';
+            }
+            
+            // Connection tags
+            const tagsEl = document.getElementById('connection-tags');
+            tagsEl.innerHTML = '';
+            if (node.connections) {
+                node.connections.forEach(connId => {
+                    const conn = data[connId];
+                    if (!conn) return;
+                    const tag = document.createElement('span');
+                    tag.className = 'connection-tag ' + getColorClass(connId);
+                    tag.textContent = conn.title;
+                    tag.onclick = () => selectNode(connId);
+                    tagsEl.appendChild(tag);
+                });
+            }
+            
+            document.getElementById('detail-panel').classList.add('visible');
+            drawConnections();
+        }
+        
+        function closeDetail() {
+            selectedNode = null;
+            document.querySelectorAll('.node.selected').forEach(el => el.classList.remove('selected'));
+            document.getElementById('detail-panel').classList.remove('visible');
+            drawConnections();
+        }
+        
+        init();
+    </script>
+</body>
+</html>
