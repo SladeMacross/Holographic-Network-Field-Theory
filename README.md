@@ -1,6 +1,3 @@
-# Holographic-Network-Field-Theory
-Conceptual Framework
-
 # HNet Theory
 **Holographic Network Theory**
 
@@ -64,12 +61,6 @@ HNet is a **conceptual framework**, not a complete mathematical theory. The arch
 - Quantitative predictions that differ from existing theories
 
 Some pieces of the mathematical puzzle already exist in adjacent fields. Some need to be developed.
-
----
-
-## License
-
-[Choose your license]
 
 ---
 
